@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { contentFingerprint, normalizedHash, scoreCandidate } from "@/lib/scoring";
+describe("candidate scoring", () => { it("uses the configured 100-point weights", () => expect(scoreCandidate({ relevance: 90, freshness: 80, value: 70, discussion: 60, credibility: 100 })).toBe(81)); it("normalizes equivalent URLs for deduplication", () => expect(normalizedHash("https://example.com/a?utm=x")).toBe(normalizedHash("https://example.com/a"))); it("creates stable content fingerprints", () => expect(contentFingerprint("A title", "An excerpt.")).toBe(contentFingerprint("a title", "an excerpt"))); });

@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { AiProviderError, generateWithFallback } from "@/lib/ai/provider";
+describe("provider fallback", () => { it("falls through a retryable provider failure", async () => { const draft = await generateWithFallback([{ name: "first", model: "a", generate: async () => { throw new AiProviderError("busy", "retryable", 429); } }, { name: "second", model: "b", generate: async () => ({ title: "A grounded technical post", content: "A useful, source-grounded observation with enough detail to pass structured draft validation and invite a professional discussion.", version: "educational", sourceClaims: [] }) }], "prompt", () => {}, 100); expect(draft.version).toBe("educational"); }); });
