@@ -2,10 +2,18 @@ import { env } from "@/lib/env";
 import { AiProvider, AiProviderError } from "@/lib/ai/provider";
 
 function extractJson(text: string): unknown {
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new AiProviderError("No JSON object in model output", "retryable");
+  // Strip markdown code fences and any prose around the JSON object.
+  const cleaned = text.replace(/```(?:json)?/gi, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end <= start) {
+    throw new AiProviderError(
+      text.trim() === "" ? "Empty model response" : "No JSON object in model output",
+      "retryable",
+    );
+  }
   try {
-    return JSON.parse(match[0]);
+    return JSON.parse(cleaned.slice(start, end + 1));
   } catch {
     throw new AiProviderError("Model output was not valid JSON", "retryable");
   }

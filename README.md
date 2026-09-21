@@ -11,17 +11,18 @@ feature flag.
 
 ## Status
 
-Early. The interface is complete and the discovery and generation APIs work against live providers, but
-**nothing is persisted yet** — the seven dashboard pages read fixtures from `src/lib/mock-data.ts`, and
-every action resets on refresh. The database migration exists but has not been applied.
+Working local tool. The Overview page fetches live news, generates drafts in three styles, checks them
+with a review pass, and persists drafts to a local JSON store (`data/store.json`). The Drafts page reads
+those saved drafts. The Ideas/Review/Calendar/Published/Analytics/Settings routes still render fixtures
+and are no longer linked in the navigation.
 
 | Area | State |
 | --- | --- |
-| Dashboard UI (8 routes) | Complete, fixture-backed |
-| Discovery and scoring (`/api/news`) | Working against live sources |
-| AI generation (`/api/generate`) | Working, but emits one version instead of three |
-| Database persistence | Not wired; migration unapplied |
-| Auth, extraction, scheduling, publishing, notifications | Not started |
+| Discovery and scoring (`/api/news`) | Working against live sources, 15-minute cache |
+| AI generation (`/api/generate`) | Working, three styles, full-article extraction when available |
+| Review pass (`/api/review`) | Working, claim-level verification against the source |
+| Draft persistence (`/api/drafts`) | Working, local JSON store |
+| Database persistence, auth, scheduling, notifications, publishing | Not started (needs Supabase/Resend credentials) |
 
 ## Requirements
 

@@ -19,10 +19,13 @@ const MAX_AGE_DAYS = 7;
 const RSS_FEEDS: { name: string; url: string; topic: string }[] = [
   { name: "The Pragmatic Engineer", url: "https://newsletter.pragmaticengineer.com/feed", topic: "Full-stack development" },
   { name: "Google Online Security", url: "https://security.googleblog.com/feeds/posts/default", topic: "Cybersecurity" },
+  { name: "OWASP Blog", url: "https://owasp.org/blog/feed.xml", topic: "Cybersecurity" },
+  { name: "Krebs on Security", url: "https://krebsonsecurity.com/feed/", topic: "Cybersecurity" },
+  { name: "The GitHub Blog", url: "https://github.blog/feed/", topic: "Full-stack development" },
 ];
 
-const DEVTO_TAGS = ["webdev", "security", "ai"];
-const HN_QUERIES = ["AI security", "LLM agents", "full-stack"];
+const DEVTO_TAGS = ["webdev", "security", "ai", "typescript", "node", "devsecops"];
+const HN_QUERIES = ["AI security", "LLM agents", "full-stack", "cybersecurity", "typescript"];
 
 function guessTopic(text: string): string {
   const t = text.toLowerCase();
@@ -137,5 +140,5 @@ export async function discoverNews(): Promise<NewsCandidate[]> {
       return new Date(c.publishedAt).getTime() > cutoff;
     })
     .sort((a, b) => b.totalScore - a.totalScore)
-    .slice(0, 12);
+    .slice(0, 15);
 }
