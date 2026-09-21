@@ -8,6 +8,7 @@ const optionalUrl = z.preprocess(emptyToUndefined, z.string().url().optional());
 const environment = z.object({
   NEXT_PUBLIC_SUPABASE_URL: optionalUrl,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalString,
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: optionalString,
   SUPABASE_SERVICE_ROLE_KEY: optionalString,
   CRON_SECRET: z.preprocess(emptyToUndefined, z.string().min(24).optional()),
   APP_URL: z.preprocess(emptyToUndefined, z.string().url().default("http://localhost:3000")),
@@ -23,4 +24,15 @@ const environment = z.object({
 });
 
 export const env = environment.parse(process.env);
-export const isDemoMode = !env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+/**
+ * The browser-safe Supabase key. Supabase issues it under two names depending on the project's key
+ * era: the legacy `anon` JWT (`NEXT_PUBLIC_SUPABASE_ANON_KEY`) and the newer opaque
+ * `sb_publishable_...` key that the dashboard labels `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+ * Both grant the same permission, so either one is accepted here.
+ */
+export function getPublicSupabaseKey() {
+  return env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+}
+
+export const isDemoMode = !env.NEXT_PUBLIC_SUPABASE_URL || !getPublicSupabaseKey();

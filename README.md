@@ -125,8 +125,9 @@ Server secrets stay server-side; only `NEXT_PUBLIC_*` values reach the browser. 
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | for live data | Supabase project URL, with no `/rest/v1/` suffix |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | for auth | Public anon / publishable key |
-| `SUPABASE_SERVICE_ROLE_KEY` | for live data | Server-only key for background writes |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | for auth | Public anon key (`eyJ…`) or publishable key (`sb_publishable_…`) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | for auth | Alias for the row above; used only when `NEXT_PUBLIC_SUPABASE_ANON_KEY` is blank |
+| `SUPABASE_SERVICE_ROLE_KEY` | for live data | Server-only key for background writes (`eyJ…` or `sb_secret_…`) |
 | `CRON_SECRET` | for cron | Bearer secret guarding the scheduled job endpoint, min 24 characters |
 | `APP_URL` | no | Base URL, defaults to `http://localhost:3000` |
 | `GEMINI_API_KEY` | for generation | Primary provider |
@@ -139,6 +140,22 @@ Server secrets stay server-side; only `NEXT_PUBLIC_*` values reach the browser. 
 
 `src/lib/env.ts` validates all of these with Zod and derives `isDemoMode`. Leave the Supabase values
 blank to force demo mode.
+
+Run `npm run check:supabase` to verify the Supabase URL, public key, and service-role key against the
+live project (it masks the keys and exits non-zero on failure). Both key formats are accepted: the
+legacy `eyJ…` JWTs and the newer opaque `sb_publishable_…` / `sb_secret_…` keys. Opaque keys carry no
+readable claims, so they are confirmed by live calls to the Auth and REST endpoints instead.
+
+Where to find them: Supabase dashboard → your project → **Connect** (`Project Settings → API Keys`).
+The `.env.local` snippet in the *Connect* panel maps to this repo as:
+
+| Connect panel | `.env` here |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | `NEXT_PUBLIC_SUPABASE_URL` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` (or its own name) |
+| *Server* tab → secret / service_role key | `SUPABASE_SERVICE_ROLE_KEY` |
+
+Restart `npm run dev` after editing `.env`; Next.js only reads it at startup.
 
 ## Database setup
 
@@ -191,7 +208,7 @@ There are no API-route, component, or end-to-end tests yet.
 
 ## Roadmap
 
-1. Apply the migration, fix the anon key, and regenerate the Resend key.
+1. Apply the migration and regenerate the Resend key.
 2. Persist discovery output and drafts, replacing the fixture imports.
 3. Emit three draft versions and add the structured review pass.
 4. Add authentication and session middleware.
